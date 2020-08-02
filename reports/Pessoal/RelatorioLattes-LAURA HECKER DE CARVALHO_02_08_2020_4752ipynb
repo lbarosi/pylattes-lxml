@@ -1,0 +1,993 @@
+{
+ "cells": [
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": [
+     "papermill-error-cell-tag"
+    ]
+   },
+   "source": [
+    "<span style=\"color:red; font-family:Helvetica Neue, Helvetica, Arial, sans-serif; font-size:2em;\">An Exception was encountered at '<a href=\"#papermill-error-cell\">In [1]</a>'.</span>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "tags": [
+     "papermill-error-cell-tag"
+    ]
+   },
+   "source": [
+    "<span id=\"papermill-error-cell\" style=\"color:red; font-family:Helvetica Neue, Helvetica, Arial, sans-serif; font-size:2em;\">Execution using papermill encountered an exception here and stopped:</span>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": 1,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-23T23:58:28.245082Z",
+     "start_time": "2020-07-23T23:58:27.825503Z"
+    },
+    "execution": {
+     "iopub.execute_input": "2020-08-02T20:47:54.283975Z",
+     "iopub.status.busy": "2020-08-02T20:47:54.283283Z",
+     "iopub.status.idle": "2020-08-02T20:47:56.739244Z",
+     "shell.execute_reply": "2020-08-02T20:47:56.738286Z"
+    },
+    "papermill": {
+     "duration": 2.491687,
+     "end_time": "2020-08-02T20:47:56.739478",
+     "exception": true,
+     "start_time": "2020-08-02T20:47:54.247791",
+     "status": "failed"
+    },
+    "tags": [
+     "HIDE"
+    ]
+   },
+   "outputs": [
+    {
+     "ename": "FileNotFoundError",
+     "evalue": "[Errno 2] No such file or directory: '/home/lbarosi/BAROSI/HOME/6000_PYTHONIA/2_Doing/01_Pylattes_PRPG/pylattes-lxml/reports/src/pylattesLXML'",
+     "output_type": "error",
+     "traceback": [
+      "\u001b[0;31m---------------------------------------------------------------------------\u001b[0m",
+      "\u001b[0;31mFileNotFoundError\u001b[0m                         Traceback (most recent call last)",
+      "\u001b[0;32m<ipython-input-1-4a920f56e74c>\u001b[0m in \u001b[0;36m<module>\u001b[0;34m\u001b[0m\n\u001b[1;32m      8\u001b[0m \u001b[0;32mfrom\u001b[0m \u001b[0mdatetime\u001b[0m \u001b[0;32mimport\u001b[0m \u001b[0mdatetime\u001b[0m \u001b[0;32mas\u001b[0m \u001b[0mdt\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m      9\u001b[0m \u001b[0mcaminho\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mos\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mpath\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mabspath\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m\"../src/pylattesLXML/\"\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0;32m---> 10\u001b[0;31m \u001b[0mos\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mchdir\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0mcaminho\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[0m\u001b[1;32m     11\u001b[0m \u001b[0mdirpath\u001b[0m \u001b[0;34m=\u001b[0m \u001b[0mos\u001b[0m\u001b[0;34m.\u001b[0m\u001b[0mgetcwd\u001b[0m\u001b[0;34m(\u001b[0m\u001b[0;34m)\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n\u001b[1;32m     12\u001b[0m \u001b[0;31m# Pacotes básicos\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0;34m\u001b[0m\u001b[0m\n",
+      "\u001b[0;31mFileNotFoundError\u001b[0m: [Errno 2] No such file or directory: '/home/lbarosi/BAROSI/HOME/6000_PYTHONIA/2_Doing/01_Pylattes_PRPG/pylattes-lxml/reports/src/pylattesLXML'"
+     ]
+    }
+   ],
+   "source": [
+    "import importlib\n",
+    "import os\n",
+    "import sys\n",
+    "from glob import glob\n",
+    "import numpy as np\n",
+    "import pandas as pd\n",
+    "import random\n",
+    "from datetime import datetime as dt\n",
+    "caminho = os.path.abspath(\"../src/pylattesLXML/\")\n",
+    "os.chdir(caminho)\n",
+    "dirpath = os.getcwd()\n",
+    "# Pacotes básicos\n",
+    "#show result from all calculations of the cell\n",
+    "from IPython.core.interactiveshell import InteractiveShell\n",
+    "InteractiveShell.ast_node_interactivity = \"all\"\n",
+    "#----Carregando Módulo\n",
+    "import pylattesLXML as lattes"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-23T23:58:28.255103Z",
+     "start_time": "2020-07-23T23:58:28.252286Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": [
+     "HIDE",
+     "parameters"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "nome = 'Luan Gomes dos Santos de Oliveira'"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": [
+     "injected-parameters"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "# Parameters\n",
+    "nome = \"LAURA HECKER DE CARVALHO\"\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-23T23:58:30.192447Z",
+     "start_time": "2020-07-23T23:58:29.258829Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": [
+     "HIDE"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "PQ = lattes.Pesquisador()\n",
+    "PQ.periodo = ['2020','2019','2018','2017'];\n",
+    "PQ.nome = nome\n",
+    "file = PQ.getFileFromNome()\n",
+    "PQ.file = file\n",
+    "tmp = PQ.validaPath();\n",
+    "tmp2 = PQ.getDadosBasicos();\n",
+    "SUMARIO = PQ.doSumario()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<center><h5> <img src=\"./assets/Logo-UFCG.png\" width=\"80\" > </h5> \n",
+    "    <h1> UNIVERSIDADE FEDERAL DE CAMPINA GRANDE </h1>\n",
+    "    <h2> PRÓ-REITORIA DE PÓS-GRADUAÇÃO </h2>\n",
+    "    <h2> Coordenação de Pesquisa </h2>\n",
+    "    </center>\n",
+    " "
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-14T17:38:29.339493Z",
+     "start_time": "2020-07-14T17:38:29.335157Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:#ff8000;\" ><h2> Informações Metodológicas </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-14T17:46:27.268798Z",
+     "start_time": "2020-07-14T17:46:27.263365Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "\n",
+    "- As informações foram extraídas do CV Lattes do pesquisador fornecido pelo próprio pesquisador.\n",
+    "- Não foi realizada validação com o DTD do Lattes porque este está desatualizado e muitos falsos inválidos surgiram na primeira análise.\n",
+    "- Todas as análises foram realizadas com Python, biblioteca LXML, que mostrou melhor performance do que as alternativas nativas.\n",
+    "- Os elementos extraídos foram todos os elementos das árvores desejadas: Dados Pessoais, Formação Acadêmica, Produção Bibliográfica, Produção Técnica, Outras Produções.\n",
+    "- O período considerado foi o período de quatro anos.\n",
+    "- Dados de lotação foram extraídos de informações da própria UFCG, quando disponíveis.\n",
+    "- Tabela Qualis é a tabela vigente.\n",
+    "- Utilizou-se uma tabela de conversão entre as áreas de conhecimento e as áreas de conhecimento CAPES.\n",
+    "- Pacote completo documentado será disponibilizado no GitHub.\n",
+    "\n"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-14T17:02:48.215944Z",
+     "start_time": "2020-07-14T17:02:48.209633Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<center><div style=\"color:blue;\" ><h1> Relatório Individual de Produção Acadêmica </h1></div></center>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:blue;\" ><h2> Informações do Sistema </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-23T23:58:35.534744Z",
+     "start_time": "2020-07-23T23:58:35.183087Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "inicio = dt.now().strftime('%d/%m/%Y %H:%M')\n",
+    "print(inicio)\n",
+    "!whoami\n",
+    "!uname -a\n",
+    "!python --version"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "### Informações das Bases de Dados"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:00:11.989271Z",
+     "start_time": "2020-07-24T00:00:10.523558Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['DB'][0].style.hide_index()"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:blue;\" ><h2> Informações do Pesquisador </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "#### Dados Pessoais\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:00:59.344114Z",
+     "start_time": "2020-07-24T00:00:59.321649Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": [
+     "HIDE"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][0]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "#### Dados Demográficos\n"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:01:30.237361Z",
+     "start_time": "2020-07-24T00:01:30.221850Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": [
+     "HIDE"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][1]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:blue;\" ><h2> Informações de Titulação e Formação</h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:01:43.496645Z",
+     "start_time": "2020-07-24T00:01:43.474675Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": [
+     "HIDE"
+    ]
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][2]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:blue;\" ><h2> Resumo da Produção Bibliográfica </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:02:10.015907Z",
+     "start_time": "2020-07-24T00:02:09.996780Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][3]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Resumo de Prodoção Técnica - Apresentações"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:03:09.350532Z",
+     "start_time": "2020-07-24T00:03:09.333760Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][4]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "## Resumo de Prodoção Técnica - Produtos e Processos"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:03:45.846697Z",
+     "start_time": "2020-07-24T00:03:45.837472Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][5]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:blue;\" ><h2> Resumo da Orientações e Outras Produções </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:04:04.718714Z",
+     "start_time": "2020-07-24T00:04:04.703454Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][6]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:blue;\" ><h2> Resumo de Dados Complementares </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:04:41.789735Z",
+     "start_time": "2020-07-24T00:04:41.767663Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['RESUMOS'][7]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-14T17:33:03.461075Z",
+     "start_time": "2020-07-14T17:33:03.455085Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<center><div style=\"color:#1A195C\" ><h1> Listagem Geral de Produção no Período </h1></div></center>"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-14T17:33:35.501249Z",
+     "start_time": "2020-07-14T17:33:35.494618Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:#1A195C;\" ><h2> Produção Bibliográfica </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:05:09.896611Z",
+     "start_time": "2020-07-24T00:05:09.842671Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['PRODUCAO'][0]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:#1A195C;\" ><h2> Produção Técnica - Apresentações </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:06:13.282276Z",
+     "start_time": "2020-07-24T00:06:13.261890Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['PRODUCAO'][1]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:#1A195C;\" ><h2> Produção Técnica - Produtos e Processos </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:07:11.703330Z",
+     "start_time": "2020-07-24T00:07:11.693726Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['PRODUCAO'][2]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:#1A195C;\" ><h2> Outras Produções </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:08:16.906718Z",
+     "start_time": "2020-07-24T00:08:16.888560Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['PRODUCAO'][3]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "<div style=\"color:#1A195C;\" ><h2> Informações Complementares </h2></div>"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "ExecuteTime": {
+     "end_time": "2020-07-24T00:08:19.120871Z",
+     "start_time": "2020-07-24T00:08:19.096249Z"
+    },
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "SUMARIO['PRODUCAO'][4]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Pontuação do Currículo antes de Normalização"
+   ]
+  },
+  {
+   "cell_type": "code",
+   "execution_count": null,
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "outputs": [],
+   "source": [
+    "PQ.doPontuacao(save_to_disk = True)[['AREA', 'ID','CPF', 'NOME', 'DOUTORADO', 'Nota_CVP']]"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "# Critérios de Pontuação"
+   ]
+  },
+  {
+   "cell_type": "markdown",
+   "metadata": {
+    "papermill": {
+     "duration": null,
+     "end_time": null,
+     "exception": null,
+     "start_time": null,
+     "status": "pending"
+    },
+    "tags": []
+   },
+   "source": [
+    "pontuacao = pd.read_excel('../data/pontuacao.xlsx')\n",
+    "pontuacao.fillna('')"
+   ]
+  }
+ ],
+ "metadata": {
+  "celltoolbar": "Tags",
+  "hide_input": false,
+  "kernelspec": {
+   "display_name": "vLattes",
+   "language": "python",
+   "name": "vlattes"
+  },
+  "language_info": {
+   "codemirror_mode": {
+    "name": "ipython",
+    "version": 3
+   },
+   "file_extension": ".py",
+   "mimetype": "text/x-python",
+   "name": "python",
+   "nbconvert_exporter": "python",
+   "pygments_lexer": "ipython3",
+   "version": "3.7.4"
+  },
+  "latex_envs": {
+   "LaTeX_envs_menu_present": true,
+   "autoclose": false,
+   "autocomplete": true,
+   "bibliofile": "biblio.bib",
+   "cite_by": "apalike",
+   "current_citInitial": 1,
+   "eqLabelWithNumbers": true,
+   "eqNumInitial": 1,
+   "hotkeys": {
+    "equation": "Ctrl-E",
+    "itemize": "Ctrl-I"
+   },
+   "labels_anchors": false,
+   "latex_user_defs": false,
+   "report_style_numbering": false,
+   "user_envs_cfg": false
+  },
+  "papermill": {
+   "duration": 4.161869,
+   "end_time": "2020-08-02T20:47:57.264784",
+   "environment_variables": {},
+   "exception": true,
+   "input_path": "RelatorioPessoalLattesUFCG.ipynb",
+   "output_path": "RelatorioLattes-LAURA HECKER DE CARVALHO_02_08_2020_4752ipynb",
+   "parameters": {
+    "nome": "LAURA HECKER DE CARVALHO"
+   },
+   "start_time": "2020-08-02T20:47:53.102915",
+   "version": "2.1.2"
+  }
+ },
+ "nbformat": 4,
+ "nbformat_minor": 4
+}
