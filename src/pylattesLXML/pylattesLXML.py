@@ -112,7 +112,7 @@ def readFolder(PATH="../../data/raw/CVs"):
     return files
 
 def makeDBnomes(PATH, save_to_disk = False):
-    """Lê todos os XML indicados no caminho e extrai informações mínimas. Nome do Arquivo, CPF, ID_CNPQ e NOME. Se arquivo não tiver informações corretas, produz outro dataframe.
+    """Lê todos os XML indicados no caminho e extrai informações mínimas. Nome do Arquivo, CPF, ID_CNself e NOME. Se arquivo não tiver informações corretas, produz outro dataframe.
 
     Args:
         PATH (type): caminho (pode usar glob) `PATH`.
@@ -214,6 +214,7 @@ class Pesquisador:
         self.__UFCG = True
         self.__SAAP = True
         self.__PONTUA = True
+        self.__FLAG = True
         self.kwargs = kwargs
         pass
 
@@ -367,27 +368,27 @@ class Pesquisador:
         if self.__SAAP:
             self.SAAP = pd.read_excel(paths['pathSAAP'])
 
-        try:
-            self.CAPES = pd.read_csv(paths['pathCAPES'])
-            #----Dados da tabela CAPES precisam ser normalizados, sem acentos para comparação de textos.
-            self.CAPES = self.CAPES.applymap(unidecode)
-        except IOError:
-            #LOG.error("Não foi encontrada: Tabela de TABELA_EQUIVALENCIA_CNPQ_CAPES")
-            self.CAPES = []
-
-        try:
-            #----encoding do CNPq precisa evoluir
-            self.QUALIS = pd.read_csv(paths['pathQualis'], encoding = "ISO-8859-1", index_col=0)
-            self.QUALIS = self.QUALIS.reset_index()
-            #----Coluna de areas tem muitos whitespaces escondidos. stripped.
-            self.QUALIS["area"] = self.QUALIS["area"].apply(lambda val: val.strip())
-            #----Normaliza e codifica para comparar áreas
-            self.QUALIS['area'] = self.QUALIS['area'].str.normalize('NFKD').str.encode('ISO-8859-1', 'ignore')
-            #----Este arquivo é muito grande e muitas comparações vão ser feitas. Categorias nas áreas vão agilizar o processamento.
-            self.QUALIS['area'] = self.QUALIS['area'].astype('category')
-        except pd.errors.EmptyDataError as error:
-            tmp = None
-            return
+        # try:
+        #     self.CAPES = pd.read_csv(paths['pathCAPES'])
+        #     #----Dados da tabela CAPES precisam ser normalizados, sem acentos para comparação de textos.
+        #     self.CAPES = self.CAPES.applymap(unidecode)
+        # except IOError:
+        #     #LOG.error("Não foi encontrada: Tabela de TABELA_EQUIVALENCIA_CNPQ_CAPES")
+        #     self.CAPES = []
+        #
+        # try:
+        #     #----encoding do CNPq precisa evoluir
+        #     self.QUALIS = pd.read_csv(paths['pathQualis'], encoding = "ISO-8859-1", index_col=0)
+        #     self.QUALIS = self.QUALIS.reset_index()
+        #     #----Coluna de areas tem muitos whitespaces escondidos. stripped.
+        #     self.QUALIS["area"] = self.QUALIS["area"].apply(lambda val: val.strip())
+        #     #----Normaliza e codifica para comparar áreas
+        #     self.QUALIS['area'] = self.QUALIS['area'].str.normalize('NFKD').str.encode('ISO-8859-1', 'ignore')
+        #     #----Este arquivo é muito grande e muitas comparações vão ser feitas. Categorias nas áreas vão agilizar o processamento.
+        #     self.QUALIS['area'] = self.QUALIS['area'].astype('category')
+        # except pd.errors.EmptyDataError as error:
+        #     tmp = None
+        #     return
 
         return
 
@@ -429,6 +430,7 @@ class Pesquisador:
             type: Array [Matrícula, Lotação].
 
         """
+        self.carregaDadosGlobais()
         if self.__UFCG:
             paths = self.validaPath()
             df = pd.read_excel(paths['pathUFCG'])
@@ -451,13 +453,8 @@ class Pesquisador:
             #----XML funciona?
             tree = etree.parse(file)
             self.__FLAG = True
-        except etree.XMLSyntaxError:
-            #LOG.error("XML inválido: %s", file)
-            #---- __FLAG impede a determinação de todos os elementos do XML.
-            self.__FLAG = False
-        except (ParserError, ParseError) as error:
-            #LOG.error("XML inválido: %s", file)
-            self.__FLAG = False
+        except:
+            self.ID = None
         else:
             #----Se estes paramêtros não puderem ser definidos o XML não é CV Lattes ou
             #----foi extraído sem informações pessoais.
@@ -465,13 +462,14 @@ class Pesquisador:
             self.ID = self.root.get('NUMERO-IDENTIFICADOR')
             self.Atualiza = self.root.get('DATA-ATUALIZACAO')
             self.NOME = self.root.getchildren()[0].get('NOME-COMPLETO')
-            #---- Start Logging
-            #LOG.info("cvP:%s", self.NOME)
             if not hasattr(self,'root'):
                 #----Sem root nã tem como fazer parsing. Os métodps seguintes retornam None.
                 self.__FLAG = False
             if not hasattr(self,'ID'):
                 #----Sem ID no xml não podemos prosseguir
+                self.__FLAG = False
+        finally:
+            if ((self.ID is None) or (self.NOME is None)):
                 self.__FLAG = False
         return self.__FLAG
     #--------------------------------------------------
@@ -496,46 +494,46 @@ class Pesquisador:
         else:
             return None
 
-    def getAreaCAPES(self, AREAS):
-        """Recebe uma lista de Áreas CNPq e retorna as áreas CAPES equivalentes.
+    # def getAreaCAPES(self, AREAS):
+    #     """Recebe uma lista de Áreas CNPq e retorna as áreas CAPES equivalentes.
+    #
+    #     Args:
+    #         AREAS (type): Areas do CNPq `AREAS`.
+    #
+    #     Returns:
+    #         type: Áreas CAPES.
+    #
+    #     """
+    #     #----Lista de áreas normalizadas
+    #     AREAS = [*AREAS]
+    #     AREAS = [ val.upper() for val in map(unidecode,AREAS)]
+    #     tabelaCapes = self.CAPES
+    #     #----Retorna as áreas CAPES normalizadas
+    #     capes = tabelaCapes[tabelaCapes["AREA_CNPQ"].isin(AREAS) ]["AREA_CAPES"].str.normalize('NFKD').str.encode('utf-8', 'ignore')
+    #
+    #     return capes.tolist()
 
-        Args:
-            AREAS (type): Areas do CNPq `AREAS`.
-
-        Returns:
-            type: Áreas CAPES.
-
-        """
-        #----Lista de áreas normalizadas
-        AREAS = [*AREAS]
-        AREAS = [ val.upper() for val in map(unidecode,AREAS)]
-        tabelaCapes = self.CAPES
-        #----Retorna as áreas CAPES normalizadas
-        capes = tabelaCapes[tabelaCapes["AREA_CNPQ"].isin(AREAS) ]["AREA_CAPES"].str.normalize('NFKD').str.encode('utf-8', 'ignore')
-
-        return capes.tolist()
-
-    def setQualis(self, Area, ISSN):
-        """Recebe uma lista de áreas CAPES e um ISSN e devolve qualis.
-
-        Args:
-            Area (type): AREA CAPES `Area`.
-            ISSN (type): `ISSN`.
-
-        Returns:
-            type: Description of returned object.
-
-        """
-        #----Várias áreas, um ISSN, tem que atuar no eixo 0 dos df.
-        AREAS = [*Area]
-        ISSN = ISSN
-        dfQUALIS = self.QUALIS[self.QUALIS['area'].isin(AREAS)]
-        rank = dfQUALIS[(dfQUALIS['issn']==ISSN)]['ranking'].tolist()
-        if len(rank)>0:
-            rank = sorted(rank)[0]
-        else:
-            rank = ''
-        return rank
+    # def setQualis(self, Area, ISSN):
+    #     """Recebe uma lista de áreas CAPES e um ISSN e devolve qualis.
+    #
+    #     Args:
+    #         Area (type): AREA CAPES `Area`.
+    #         ISSN (type): `ISSN`.
+    #
+    #     Returns:
+    #         type: Description of returned object.
+    #
+    #     """
+    #     #----Várias áreas, um ISSN, tem que atuar no eixo 0 dos df.
+    #     AREAS = [*Area]
+    #     ISSN = ISSN
+    #     dfQUALIS = self.QUALIS[self.QUALIS['area'].isin(AREAS)]
+    #     rank = dfQUALIS[(dfQUALIS['issn']==ISSN)]['ranking'].tolist()
+    #     if len(rank)>0:
+    #         rank = sorted(rank)[0]
+    #     else:
+    #         rank = ''
+    #     return rank
 
     @staticmethod
     def BlocoLattes(root, lista ):
@@ -699,6 +697,8 @@ class Pesquisador:
                     df[col] = ''
             df = df[cols_fix]
             df = df.fillna('')
+        else:
+            df = pd.DataFrame(columns = cols_fix)
         return df
 
     #--------------------------------------------------
@@ -718,11 +718,11 @@ class Pesquisador:
             df = pd.DataFrame(lista[0])
             #---- Organizando DF
             cols = ["NOME-COMPLETO", "CPF", "PAIS-DE-NASCIMENTO", "UF-NASCIMENTO", "DATA-NASCIMENTO","SEXO", "RACA-OU-COR"]
-            cols = df.columns.tolist()
-            new_cols = list(set(cols).intersection(set(cols)))
+            coldf = df.columns.tolist()
+            new_cols = list(set(coldf).intersection(set(cols)))
             df = df[new_cols]
             #----
-            #----Incluindo dados do bando de servidores
+            #----Incluindo dados do banco de servidores
             if self.__UFCG:
                 try:
                     CPF = df['CPF'].values[0]
@@ -811,17 +811,17 @@ class Pesquisador:
                 df = self.dfTidy(df, cols_keep=cols_keep, cols_merge = cols_merge, cols_equiv = cols_equiv, cols_out=cols_out, cols_final=cols_final)
                 #----Filtrando
                 df = df[df['ANO'].isin(self.periodo)]
-                #----Validando ISSN/ISBN
-                if 'ISSN-ISBN' not in df.columns.tolist():
-                    if 'ISSN' not in df.columns.tolist():
-                        if 'ISBN' in df.columns.tolist():
-                            df.rename(columns = {'ISBN':'ISSN-ISBN'})
-                        else:
-                            df['ISSN-ISBN'] = ""
-                    else:
-                        df.rename(columns = {'ISSN':'ISSN-ISBN'})
-                df['ISSN-ISBN'] = df['ISSN-ISBN'].apply(self.validaISSN_ISBN)
-                df['ISSN-ISBN'] = df['ISSN-ISBN'].apply(lambda val: ''.join(val))
+                # #----Validando ISSN/ISBN
+                # if 'ISSN-ISBN' not in df.columns.tolist():
+                #     if 'ISSN' not in df.columns.tolist():
+                #         if 'ISBN' in df.columns.tolist():
+                #             df.rename(columns = {'ISBN':'ISSN-ISBN'})
+                #         else:
+                #             df['ISSN-ISBN'] = ""
+                #     else:
+                #         df.rename(columns = {'ISSN':'ISSN-ISBN'})
+                # df['ISSN-ISBN'] = df['ISSN-ISBN'].apply(self.validaISSN_ISBN)
+                # df['ISSN-ISBN'] = df['ISSN-ISBN'].apply(lambda val: ''.join(val))
                 # #---- QUALIS
                 # AREA_CNPQ = self.getArea()
                 # AREA_CAPES = self.getAreaCAPES(AREA_CNPQ)
@@ -1003,280 +1003,119 @@ class Pesquisador:
         return
     #--------------------------------------------------
     #----Resumos e Relatórios
-    def doSumario(self):
+    def doSumarioUFCG(self):
         """Chamada no jupyter notebook para gerar relatório geral do pesquisador.
 
         Returns:
             type: Dicionário com elementos do Sistema, Sumários e dados listados de produção.
 
         """
-
-        #----Arquivos externos utilizados
-        tmp = self.validaPath();
-        dfExternos = pd.DataFrame([tmp])
-        dadosGlobais = None
-        Pessoais = None
-        Titulacao = None
-        Bibliografico = None
-        Apresentacoes = None
-        Tecnico = None
-        Outra = None
-        Complementares = None
-
         dadosGlobais = self.carregaDadosGlobais()
-        Pessoais = self.getDadosPessoais()
-        Titulacao = self.getDadosTitulacao()
-        Bibliografico = self.getProducaoBibliografica()
-        Apresentacoes = self.getApresentacoes()
-        Tecnico = self.getProducaoTecnica()
-        Outra = self.getProducaoOutra()
-        Complementares = self.getDadosComplementares()
-        #----Colunas
-        cols_final_Pessoais = ['DATA-ATUALIZACAO', 'ID', 'CPF', 'Matrícula', 'IES', 'Lotação', 'NOME-COMPLETO']
-        cols_final_Demograficos = ['NOME-COMPLETO', 'DATA-NASCIMENTO','NACIONALIDADE', 'RACA-OU-COR', 'SEXO', 'UF-NASCIMENTO']
-        colsP = cols_final_Pessoais + cols_final_Demograficos
-        for col in colsP:
-            if col not in Pessoais.columns.tolist():
-                Pessoais.loc[:,col] = ''
-        #----Titulos
-        cols_final_Titulos = ['ANO-DE-CONCLUSAO','ANO-DE-INICIO','TITULACAO', 'NOME-INSTITUICAO', 'NOME-AGENCIA', 'TIPO',
-                              'SEQUENCIA-FORMACAO','NOME-CURSO', 'STATUS-DO-CURSO']
-        #----Bibliograficos
-        lista_final_Bib = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA', 'CLASSIFICACAO-DO-EVENTO', 'NOME-DO-EVENTO', 'TITULO', 'PAIS','REVISTA', 'DOI', 'ISSN-ISBN']
-        #----Tecnicos
-        lista_final_Tec = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA','TIPO-PRODUCAO','TITULO']
-        #----Apresentacoes
-        lista_final_Apresentacoes = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA','TITULO', 'IDIOMA', 'PAIS', 'DOI']
-        #----Outras
-        lista_final_Outra = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA', 'TIPO-DE-ORIENTACAO-CONCLUIDA','TITULO',
-                             'IDIOMA', 'PAIS']
-        #----Complementares
-        lista_final_Complementares = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA', 'TITULO', 'IDIOMA', 'PAIS', 'DOI']
-        #----Arrumando dataframes
-        #----
-        Pessoal = Pessoais[cols_final_Pessoais]
-        Demografico = Pessoais[cols_final_Demograficos]
-        Titulacao = Titulacao[cols_final_Titulos]
-        Bibliografico = Bibliografico[lista_final_Bib]
-        Bibliografico = Bibliografico.fillna('')
-        #Bibliografico = Bibliografico.assign(flag_ISSN = lambda val: True if (len(val['ISSN-ISBN'])>8 or len(val['DOI'])>0) else '', flag_Qualis = lambda val: True if (str(val['QUALIS'])[0] in ['A','B']) else '')
-        #----
-        Tecnico = self.fixDF(Tecnico, lista_final_Tec)
-        #----
-        Apresentacoes = self.fixDF(Apresentacoes, lista_final_Apresentacoes)
-        #----
-        Outra = self.fixDF(Outra, lista_final_Outra)
-        #----
-        Complementares = self.fixDF(Complementares, lista_final_Complementares)
-        #----
-        #----Resumos
-        if Bibliografico is not None:
-            resumo_Biblio = Bibliografico.groupby(['PRODUCAO', 'NATUREZA',
-                                                   'CLASSIFICACAO-DO-EVENTO', #'flag_Qualis','flag_ISSN' ,
-                                                   'PAIS'])['SEQUENCIA-PRODUCAO'].count().reset_index()
-            resumo_Biblio = resumo_Biblio.rename(columns={'CLASSIFICACAO-DO-EVENTO':'TIPO'})
-        #----
-        if Tecnico is not None:
-            resumo_Tec = Tecnico.groupby(['PRODUCAO','NATUREZA', 'TIPO-PRODUCAO'])['SEQUENCIA-PRODUCAO'].count().reset_index()
-            resumo_Tec = resumo_Tec.rename(columns={'TIPO_PRODUCAO':'TIPO'})
-        #----
-        if Apresentacoes is not None:
-            resumo_Apres = Apresentacoes.groupby(['PRODUCAO', 'NATUREZA','PAIS'])['SEQUENCIA-PRODUCAO'].count().reset_index()
-        #----
-        if Outra is not None:
-            resumo_Outra = Outra.groupby(['PRODUCAO', 'NATUREZA','PAIS', 'TIPO-DE-ORIENTACAO-CONCLUIDA'])['SEQUENCIA-PRODUCAO'].count().reset_index()
-            resumo_Outra = resumo_Outra.rename(columns={'TIPO-DE-ORIENTACAO-CONCLUIDA':'TIPO'})
-        #----
-        if Complementares is not None:
-            resumo_Comp = Complementares.groupby(['PRODUCAO', 'NATUREZA','PAIS'])['SEQUENCIA-PRODUCAO'].count().reset_index()
-            #----
+        flag = self.getDadosBasicos()
+        if flag:
+        #----Arquivos externos utilizados
+            tmp = self.validaPath();
+            dfExternos = pd.DataFrame([tmp])
+            # try:
+            #     tmp = self.ID
+            # except AttributeError as error:
+            #     print('BAD XML:')
+            #     return
+            #else:
 
-        resultado = {'DB':[dfExternos],
-                     'RESUMOS':[Pessoal, Demografico, Titulacao, resumo_Biblio, resumo_Apres, resumo_Tec, resumo_Outra, resumo_Comp],
-                     'PRODUCAO':[Bibliografico, Apresentacoes, Tecnico, Outra, Complementares]}
-        return resultado
+        #----Lendo dados de XML
+            dadosGlobais = self.carregaDadosGlobais()
+            Pessoais = self.getDadosPessoais()
+            Titulacao = self.getDadosTitulacao()
+            Bibliografico = self.getProducaoBibliografica()
+            Apresentacoes = self.getApresentacoes()
+            Tecnico = self.getProducaoTecnica()
+            Outra = self.getProducaoOutra()
+            Complementares = self.getDadosComplementares()
+            #----Colunas
+            cols_final_Pessoais = ['DATA-ATUALIZACAO', 'ID', 'CPF', 'Matrícula', 'IES', 'Lotação', 'NOME-COMPLETO']
+            cols_final_Demograficos = ['NOME-COMPLETO', 'DATA-NASCIMENTO','NACIONALIDADE', 'RACA-OU-COR', 'SEXO', 'UF-NASCIMENTO']
+            colsP = cols_final_Pessoais + cols_final_Demograficos
+            cols_final_Titulos = ['ANO-DE-CONCLUSAO','ANO-DE-INICIO','TITULACAO', 'NOME-INSTITUICAO', 'NOME-AGENCIA', 'TIPO',
+                                          'SEQUENCIA-FORMACAO','NOME-CURSO', 'STATUS-DO-CURSO']
+            lista_final_Bib = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA', 'CLASSIFICACAO-DO-EVENTO', 'NOME-DO-EVENTO', 'TITULO', 'PAIS','REVISTA']
+            lista_final_Tec = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA','TIPO-PRODUCAO','TITULO']
+            lista_final_Apresentacoes = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA','TITULO', 'IDIOMA', 'PAIS']
+            lista_final_Outra = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA', 'TIPO-DE-ORIENTACAO-CONCLUIDA','TITULO', 'IDIOMA', 'PAIS']
+            lista_final_Complementares = ['ANO', 'SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA', 'TITULO', 'IDIOMA', 'PAIS']
+            Pessoais = self.fixDF(Pessoais,colsP)
+            Pessoal = Pessoais[cols_final_Pessoais]
+            Demografico = Pessoais[cols_final_Demograficos]
+            Titulacao = Titulacao[cols_final_Titulos]
+            Bibliografico = self.fixDF(Bibliografico, lista_final_Bib)
+            Tecnico = self.fixDF(Tecnico, lista_final_Tec)
+            Apresentacoes = self.fixDF(Apresentacoes, lista_final_Apresentacoes)
+            Outra = self.fixDF(Outra, lista_final_Outra)
+            Complementares = self.fixDF(Complementares, lista_final_Complementares)
+            colunasResumo =  ['PRODUCAO', 'NATUREZA', 'TIPO','SEQUENCIA-PRODUCAO', 'PAIS']
+            Bibliografico = Bibliografico.rename(columns={'CLASSIFICACAO-DO-EVENTO':'TIPO'})
+            Tecnico = Tecnico.rename(columns={'TIPO_PRODUCAO':'TIPO'})
+            Outra = Outra.rename(columns={'TIPO-DE-ORIENTACAO-CONCLUIDA':'TIPO'})
+            produtos = [Bibliografico, Apresentacoes, Tecnico, Outra, Complementares]
+            resumos= [self.fixDF(df,colunasResumo) for df in produtos]
+            df = pd.concat(resumos)
+            df = df.replace({'':'VAZIO'})
+            df.loc[:,'flag_Nacional'] = df['PAIS'].apply(lambda val: 'Nacional' if str(val)=='Brasil' else ('Internacional' if len(val)!=0 else "VAZIO"))
+            dfPontos = df.merge(self.Pontos, on = ['PRODUCAO','NATUREZA','flag_Nacional'], how = 'left')
+            dfPontos = dfPontos.dropna(axis = 0)
+            dfPontos = dfPontos[['LATTES', 'PRODUCAO','NATUREZA','flag_Nacional','SEQUENCIA-PRODUCAO','PONTOS','MAX']]
+            dfSum = dfPontos.groupby(['LATTES', 'PRODUCAO','NATUREZA','flag_Nacional']).agg({'SEQUENCIA-PRODUCAO':'nunique', 'PONTOS':'max', 'MAX':'max'}).reset_index()
+            dfSum['Pontuacao'] = np.where(((dfSum['SEQUENCIA-PRODUCAO']*dfSum['PONTOS']<= dfSum['MAX']) & (dfSum['MAX']!=0)),
+            dfSum['SEQUENCIA-PRODUCAO']*dfSum['PONTOS'], dfSum['MAX'])
 
-
-#---------------------------------------------------------------------------------------
-#-------------------------doPontuaSAAP----------------------------------------------
-#---------------------------------------------------------------------------------------
-    def doPontuacaoSAAP(self, save_to_disk=True):
-
-        #----Roda os métodos d classe para coletar as informações necessárias
-        df = pd.DataFrame()
-        ano_doutor = 0
-        Pessoais = self.getDadosPessoais()
-        Titulos = self.getDadosTitulacao()
-        Bib = self.getProducaoBibliografica()
-        Tec = self.getProducaoTecnica()
-        Outra = self.getProducaoOutra()
-        AREA = self.getArea()
-        if AREA is not None:
-            Area = ' '.join(self.getArea())
-        doutorBoole = Titulos[Titulos['TITULACAO']=='DOUTORADO']['ANO-DE-CONCLUSAO']
-
-        if not doutorBoole.empty:
+            nota_Producao = dfSum['Pontuacao'].sum()
             try:
-                ano_doutor = int(Titulos[Titulos['TITULACAO']=='DOUTORADO']['ANO-DE-CONCLUSAO'].max())
+                CPF = self.root.find('DADOS-GERAIS').attrib['CPF']
+            except:
+                CPF = self.file.split('/')[-1].split('-')[0]
+            try:
+                ano_doutor = int(Titulacao[Titulacao['TITULACAO']=='DOUTORADO']['ANO-DE-CONCLUSAO'].max())
             except (UnboundLocalError, ValueError, TypeError) as error:
-                ano_doutor = 0
+                ano_doutor = 0.0
+            if isinstance(CPF,str):
+                try:
+                    DATA_saap = self.SAAP
+                    DATA_saap = self.SAAP[['CPF_NUMERO','AVALIACOES']]
+                    DATA_saap.columns = ['CPF',"AVALIACOES"]
+                except AttributeError as error:
+                    n_saap = 0
+                else:
+                    DATA_saap = DATA_saap.copy()
+                    DATA_saap.loc[:,'CPF'] = DATA_saap['CPF'].astype(str)
+                    DATA_saap.loc[:,'PONTOS'] = DATA_saap['AVALIACOES']*0.25
+                    n_saap =  max(DATA_saap[DATA_saap['CPF']== CPF]['PONTOS'].values,2) if CPF in DATA_saap['CPF'].tolist() else 0
+                finally:
+                    NOTA_Doutorado = 12 if (2020-ano_doutor)<=5 else ( 8 if ano_doutor!=0 else 0)
+
+            NOTA_CVP = n_saap + NOTA_Doutorado + nota_Producao
+            AREA = self.getArea()
+            if AREA is not None:
+                Area = ' '.join(self.getArea())
+
+            infoCVP = {'ID':self.ID,
+                        'NOME':unidecode(self.NOME.strip().upper()),
+                        'CPF': CPF,
+                        'CPF_SAAP':self.file.split('/')[-1].split('.')[0].split('-')[0],
+                        'ID_proj':self.file.split('/')[-1].split('.')[0].split('-')[1],
+                        'EDITAL': self.file.split('/')[-2].split('-')[0],
+                       'AREA':Area,
+                       'PRODUCAO':nota_Producao, 'DOUTOR':ano_doutor, 'SAAP':n_saap,
+                        'NOTA':NOTA_CVP}
+            df = pd.DataFrame([infoCVP])
+
+            result = [df, dfPontos, dfSum, Pessoal, Demografico, Titulacao]
+
         else:
-            ano_doutor = 0
+            print('BAD XML:')
+            return
 
-        if Bib is not None:
-            if not Bib.empty:
-                lista_final_Bib = ['ID','SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA', 'PAIS']
-                Bib = Bib[lista_final_Bib]
-                Bib = Bib.fillna('')
-                #----Cria flag nacional para pontuacao
-                Bib = Bib.assign(flag_Nacional = lambda val: 'Nacional' if str(val['PAIS'])=='Brasil' else ('Internacional' if len(val['PAIS']!=0) else " "))
-                #----Apenas 3 níveis podem ter diferença de pontuação
-                resumo_Biblio = Bib.groupby(['ID','PRODUCAO', 'NATUREZA', 'flag_Nacional'])['SEQUENCIA-PRODUCAO'].nunique().reset_index()
-                resumo_Biblio = resumo_Biblio[['ID','PRODUCAO', 'NATUREZA', 'flag_Nacional','SEQUENCIA-PRODUCAO']]
-            else:
-                resumo_Biblio = pd.DataFrame()
-        else:
-            resumo_Biblio = pd.DataFrame()
+        return result
 
-            #----Tecnicos
-        if Tec is not None:
-            if not Tec.empty:
-                lista_final_Tec = ['ID','SEQUENCIA-PRODUCAO', 'PRODUCAO', 'NATUREZA']
-                #if 'NATUREZA' not in Tec.columns.tolist():
-                Tec['NATUREZA'] = 'NATUREZA'
-                resumo_Tec = Tec.groupby(['ID','PRODUCAO','NATUREZA'])['SEQUENCIA-PRODUCAO'].nunique().reset_index()
-                resumo_Tec = resumo_Tec[['ID','PRODUCAO', 'NATUREZA','SEQUENCIA-PRODUCAO']]
-            else:
-                resumo_Tec = pd.DataFrame()
-        else:
-            resumo_Tec = pd.DataFrame()
-            #----dfOutra
-        if  Outra is not None:
-            if not Outra.empty:
-                Outra = Outra.fillna("")
-                resumo_Outra = Outra.groupby(['ID','PRODUCAO', 'NATUREZA'])['SEQUENCIA-PRODUCAO'].nunique().reset_index()
-                resumo_Outra = resumo_Outra[['ID','PRODUCAO', 'NATUREZA','SEQUENCIA-PRODUCAO']]
-            else:
-                resumo_Outra = pd.DataFrame()
-        else:
-            resumo_Outra = pd.DataFrame()
-
-        #----Concatena
-        dflist = [resumo_Biblio, resumo_Tec, resumo_Outra]
-        list_df_tipos = [val for val in dflist if not val.empty]
-        try:
-            df_tipos = pd.concat(list_df_tipos)
-        except ValueError as error:
-            NOTA_pesquisador = pd.DataFrame(columns = ['ID','NOME'])
-        else:
-        #----sumários
-        #if 'NATUREZA' not in df_tipos.columns.tolist():
-        #    df_tipos['NATUREZA'] = 'NATUREZA'
-            if 'flag_Nacional' not in df_tipos.columns.tolist():
-                df_tipos['flag_Nacional'] = 'UNDEF'
-            df_producoes = df_tipos.groupby(['ID', 'PRODUCAO', 'NATUREZA', 'flag_Nacional'])['SEQUENCIA-PRODUCAO'].nunique().reset_index()
-            NOTAS_raw = df_producoes.merge(self.Pontos, on=['PRODUCAO', 'NATUREZA', 'flag_Nacional'], how = 'left')
-            #----Calcula notas das produções agrupadas
-            NOTAS_raw['NOTA_ITEM'] = NOTAS_raw['SEQUENCIA-PRODUCAO']*NOTAS_raw['PONTOS']
-            NOTAS_raw['NOTAS_CUT'] = np.where(((NOTAS_raw['NOTA_ITEM']<=NOTAS_raw['MAX']) |
-                                               (NOTAS_raw['MAX'].isna())), NOTAS_raw['NOTA_ITEM'], NOTAS_raw['MAX'])
-            NOTAS_raw = NOTAS_raw[['ID', 'NOTA_ITEM', 'NOTAS_CUT']]
-            #----Sumariza para notas únicas
-            NOTA_pesquisador = NOTAS_raw.groupby('ID').sum().reset_index()
-
-        #----Dados Pessoais
-        NOTA_pesquisador.at[0,'ID'] = self.ID
-        NOTA_pesquisador.at[0,'NOME'] = self.NOME
-        NOTA_pesquisador = NOTA_pesquisador.merge(Pessoais, on ='ID', how='inner')
-        #----CPF pode ser complicado
-        try:
-            CPF = self.root.find('DADOS-GERAIS').attrib['CPF']
-        except (KeyError, AttributeError) as error:
-            CPF = self.file.split('/')[-1].split('-')[0]
-        #NOTA_pesquisador.loc[:,'CPF'] = CPF
-        NOTA_pesquisador.at[0,'CPF'] = CPF
-        #----Para fazer análises apenas
-        NOTA_pesquisador.at[0,'AREA'] = " ".join(self.getArea())
-        #----Doutorado influi na pontuação
-        NOTA_pesquisador.at[0,'DOUTORADO'] = ano_doutor
-        NOTA_Doutorado = 12 if (2020-ano_doutor)<=5 else ( 8 if ano_doutor!=0 else 0)
-        #----Participações no SAAP: precisa de informação de CPF!
-        if isinstance(CPF,str):
-            try:
-                DATA_saap = self.SAAP
-                DATA_saap = self.SAAP[['CPF_NUMERO','AVALIACOES']]
-                DATA_saap.columns = ['CPF',"AVALIACOES"]
-            except AttributeError as error:
-                n_saap = 0
-            else:
-                DATA_saap = DATA_saap.copy()
-                DATA_saap.loc[:,'CPF'] = DATA_saap['CPF'].astype(str)
-                DATA_saap.loc[:,'PONTOS'] = DATA_saap['AVALIACOES']*0.25
-                n_saap =  max(DATA_saap[DATA_saap['CPF']== CPF]['PONTOS'].values,2) if CPF in DATA_saap['CPF'].tolist() else 0
-            finally:
-                NOTA_pesquisador['SAAP'] = n_saap
-                NOTA_Doutorado = 12 if (2020-ano_doutor)<=5 else ( 8 if ano_doutor!=0 else 0)
-        else:
-            n_saap = 0
-            if 'NOTA_ITEM' in NOTA_pesquisador.columns.tolist():
-                NOTA_pesquisador['SAAP'] = n_saap
-                NOTA_pesquisador = NOTA_pesquisador.assign(Nota_CVP = NOTA_Doutorado + max(NOTA_pesquisador['NOTA_ITEM'].values,NOTA_pesquisador['NOTA_ITEM'].values) + n_saap)
-            else:
-                n_saap = 0
-                NOTA_pesquisador['SAAP'] = n_saap
-                NOTA_pesquisador['NOTA_ITEM'] = 0
-                NOTA_pesquisador['NOTAS_CUT'] = 0
-                NOTA_pesquisador = NOTA_pesquisador.assign(Nota_CVP = NOTA_Doutorado + max(NOTA_pesquisador['NOTA_ITEM'].values,NOTA_pesquisador['NOTA_ITEM'].values) + n_saap)
-
-
-                NOTA_pesquisador = NOTA_pesquisador.assign(Nota_CVP = NOTA_Doutorado + max(NOTA_pesquisador['NOTA_ITEM'].values,NOTA_pesquisador['NOTA_ITEM'].values) + n_saap)
-
-        df = NOTA_pesquisador
-
-        ID_proj = self.file.split('/')[-1].split('-')[1].split('.')[0]
-        if 'Nota_CVP' not in df.columns:
-            Nota_CVP = n_saap + NOTA_Doutorado
-            df['Nota_CVP'] = Nota_CVP
-
-        df.at[0,'ID_proj'] = ID_proj
-        df = NOTA_pesquisador[['ID_proj', 'AREA', 'ID', 'CPF', 'NOME', 'DOUTORADO', 'SAAP', 'Nota_CVP']]
-
-        if save_to_disk:
-            inicio = dt.now().strftime('%d_%m_%Y__%H_%M')
-            if ((ID_proj is not None) and (self.ID is not None) and (self.NOME is not None)):
-                name = '../../reports/CVsranking/' + ID_proj + '_' + self.ID + '-[' + self.NOME + ']-' + inicio + '.xlsx'
-            else:
-                name = '../../reports/CVsranking/' + 'problemas' + inicio + '.xlsx'
-            filename =  pathHandler(name)
-            df.to_excel(filename, index = False)
-        return df
-#---------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------
-#---------------------------------------------------------------------------------------
-
-    def doReportPDF(self):
-        return
-
-def doNotasUFCG(path, save_to_disk=True):
-    pessoas = pd.read_excel(path)
-    CVPs = []
-    for cv in pessoas['FILE'].to_list():
-        self = Pesquisador()
-        self.periodo = ['2020','2019','2018','2017'];
-        self.file = cv
-        tmp = self.validaPath();
-        tmp1 = self.carregaDadosGlobais()
-        tmp2 = self.getDadosBasicos();
-        CVPs.append(PQ.doPontuacao(save_to_disk = save_to_disk))
-    NOTAS_UFCG = pd.concat(CVPs)
-    if save_to_disk:
-        inicio = dt.now().strftime('%d_%m_%Y__%H_%M')
-        name = '../../reports/CVsranking/' + 'NOTAS_UFCG_' + inicio + '.xlsx'
-        filename =  pathHandler(name)
-        NOTAS_UFCG.to_excel(filename, index = False)
-        NOTAS_UFCG.to_excel()
-
-    return NOTAS_UFCG
 #-----------------------------------------------------------------------
 def main():
     PATH = pathHandler()

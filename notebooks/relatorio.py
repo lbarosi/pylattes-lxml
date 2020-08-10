@@ -16,7 +16,7 @@ def filename(nome):
     return filename
 
 def run_notebook(nome):
-    # take only the name of the file, and ignore the .xlsx ending
+
     notebook_template = 'RelatorioPessoalLattesUFCG.ipynb'
     nome_arquivo = filename(nome)
     # run with papermill
@@ -34,6 +34,8 @@ def generate_html_report(filename):
             "jupyter",
             "nbconvert",
             filename,
+            "--no-input",
+            "--no-prompt",
             "--to=html",
         ]
     )
